@@ -4,7 +4,6 @@ var cross;
 var board = [[null, null, null],[null, null, null],[null, null, null]];
 var winner;
 var rounds = 0;
-var lastRoundPlayer;
 
 var name1 = {
   name: 'name1',
@@ -16,11 +15,10 @@ var name2 = {
 }
 
 var checkWinner = (board) => {
-  console.log('board', board)
   for (var i = 0; i < 3; i++) {
-    if (board[i][1] === board[i][2] && board[i][2] === board[i][3]) {
+    if (board[i][1] === board[i][2] && board[i][2] === board[i][0]) {
       return board[i][1];
-    } else if (board[1][i] === board[2][i] && board[2][i] === board[3][i]) {
+    } else if (board[1][i] === board[2][i] && board[2][i] === board[0][i]) {
       return board[1][i];
     } else if (board[1][1] === board[2][2] && board[2][2] === board[0][0]) {
       return board[1][1];
@@ -28,6 +26,7 @@ var checkWinner = (board) => {
       return board[1][1];
     }
   }
+  return null;
 }
 
 console.log('Welcome to Tic Tac Toe. Please enter your names');
@@ -39,48 +38,71 @@ inquirer.prompt([name1, name2])
   })
   .then(() => {
     var roundInit = (player) =>{
-      console.log(rounds, 'rounds')
       if (rounds >= 9) {
-        return 'game over';
+        console.log('game over');
       } else if (winner) {
-        return winner;
       } else {
         if (player === 'cross') {
           var turncross = {
             name: 'move',
-            message: `Cross, Please pick an empty tile.
+            message: `${cross}, Please pick an empty tile.
                       ${JSON.stringify(board[0])}
                       ${JSON.stringify(board[1])}
-                      ${JSON.stringify(board[2])}`
+                      ${JSON.stringify(board[2])}
+                     `
           }
           inquirer.prompt([turncross])
             .then(function (answers) {
-              board[Number(answers.move.charAt(0))][Number(answers.move.charAt(2))] = 'x';
-              rounds++;
-              checkWinner(board);
+              if (!board[Number(answers.move.charAt(0))][Number(answers.move.charAt(2))]) {
+                console.log(answers)
+                board[Number(answers.move.charAt(0))][Number(answers.move.charAt(2))] = 'x';
+                rounds++;
+              } else {
+                console.log('please choose another, this is already taken!');
+                return roundInit('cross');
+              }
+              if (checkWinner(board)) {
+                console.log(
+                      `${JSON.stringify(board[0])}
+                      ${JSON.stringify(board[1])}
+                      ${JSON.stringify(board[2])}
+                     `);
+                return console.log('the winner is ', checkWinner(board));
+              };
               return roundInit('circle')
             })
         } else {
           var turncircle = {
             name: 'move',
-            message: `Circle, Please pick an empty tile.
+            message: `${circle}, Please pick an empty tile.
                       ${JSON.stringify(board[0])}
                       ${JSON.stringify(board[1])}
-                      ${JSON.stringify(board[2])}`
+                      ${JSON.stringify(board[2])}
+                     `
           }
           inquirer.prompt([turncircle])
             .then(function (answers) {
-              board[Number(answers.move.charAt(0))][Number(answers.move.charAt(2))] = 'o';
-              rounds++;
-              checkWinner(board);
+              if (!board[Number(answers.move.charAt(0))][Number(answers.move.charAt(2))]) {
+                console.log(answers)
+                board[Number(answers.move.charAt(0))][Number(answers.move.charAt(2))] = 'o';
+                rounds++;
+              } else {
+                console.log('please choose another, this is already taken!');
+                return roundInit('circle');
+              }
+              if (checkWinner(board)) {
+                console.log(
+                      `${JSON.stringify(board[0])}
+                      ${JSON.stringify(board[1])}
+                      ${JSON.stringify(board[2])}
+                     `);
+                return console.log('the winner is ', checkWinner(board));
+              };
               return roundInit('cross')
             })
         }
       }
     }
-    return roundInit('circle');
-  })
-  .then((result) => {
-    console.log(result);
+    roundInit('circle');
   })
 
